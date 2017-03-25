@@ -312,9 +312,9 @@ local_env.Append(LIBS = [
 	#File('/usr/lib32/libpng.so'),
 	File('#/linux/libcurl/libcurl.a'),
 	File('#/linux/polarssl/libpolarssl.a'),
-	File('#/linux/boost/lib/libboost_filesystem.a'),
-	File('#/linux/boost/lib/libboost_system.a'),
-	File('#/linux/boost/lib/libboost_thread.a')
+	File('/usr/lib32/libboost_filesystem.a'),
+	File('/usr/lib32/libboost_system.a'),
+	File('/usr/lib32/libboost_thread.a')
 ])
 
 if NO_GCH == '0':
