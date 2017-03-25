@@ -6,7 +6,7 @@ mkdir -p ~/games/tdm/darkmod
 # --debug=explain
 
 # $@ = pass along the flags like "BUILD=profile" or "BUILD=debug"
-time scons -j2 BUILD_GAMEPAK=1 NO_GCH=0 BUILD=release --debug=explain "$@"
+time scons -j3 BUILD_GAMEPAK=1 NO_GCH=0 BUILD=release --debug=explain "$@"
 mv gamex86-base.so gamex86.so
 #strip gamex86.so
 #strip thedarkmod.x86
