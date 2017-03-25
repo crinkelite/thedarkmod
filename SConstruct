@@ -304,6 +304,7 @@ if ( g_os == 'Linux' ):
 	# get the 64 bits machine on the distcc array to produce 32 bit binaries :)
 	BASECPPFLAGS.append( '-m32' )
 	BASELINKFLAGS.append( '-m32' )
+	BASELINKFLAGS.append( 'MD5-timestamp' )
     
 	if ( OPENMP != '0' ):
 		# openmp support for changes made to the renderer
