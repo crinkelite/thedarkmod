@@ -43,9 +43,12 @@ extern xthreadInfo asyncThread;
 
 bool		Posix_AddKeyboardPollEvent( int key, bool state );
 bool		Posix_AddMousePollEvent( int action, int value );
+bool		Posix_AddAxisPollEvent( int axis, int value );
 
 void		Posix_PollInput( void );
+void		Posix_PollSDLInput( void );
 void		Posix_InitConsoleInput( void );
+
 void		Posix_Shutdown( void );
 
 void		Sys_FPE_handler( int signum, siginfo_t *info, void *context );

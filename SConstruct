@@ -304,7 +304,6 @@ if ( g_os == 'Linux' ):
 	# get the 64 bits machine on the distcc array to produce 32 bit binaries :)
 	BASECPPFLAGS.append( '-m32' )
 	BASELINKFLAGS.append( '-m32' )
-	BASELINKFLAGS.append( 'MD5-timestamp' )
     
 	if ( OPENMP != '0' ):
 		# openmp support for changes made to the renderer
@@ -587,6 +586,7 @@ if ( TARGET_GAME == '1' ):
 		# building an SDK, use scons for dependencies walking
 		# clear the build directory to be safe
 		g_env.PreBuildSDK( [ g_build + '/game' ] )
+		g_env.Decider( 'MD5-timestamp' )
 		dupe = 1
 	VariantDir( g_build + '/game', '.', duplicate = dupe )
 	idlib_objects = SConscript( g_build + '/game/sys/scons/SConscript.idlib' )

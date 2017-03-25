@@ -140,6 +140,25 @@ sysEvent_t idSysLocal::GenerateMouseMoveEvent( int deltax, int deltay ) {
 	return ev;
 }
 
+sysEvent_t idSysLocal::GenerateJoyAxisEvent( int axis, int value ) {
+	sysEvent_t ev;
+	ev.evType = SE_JOYSTICK_AXIS;
+	ev.evValue = axis;
+	ev.evValue2 = value;
+	ev.evPtrLength = 0;
+	ev.evPtr = NULL;
+	return ev;
+}
+
+sysEvent_t idSysLocal::GenerateJoyButtonEvent( int button, bool down ) {
+	sysEvent_t ev;
+	ev.evType = SE_KEY;
+	ev.evValue = K_JOY1 + button - 1;
+	ev.evValue2 = down;
+	ev.evPtrLength = 0;
+	ev.evPtr = NULL;
+	return ev;
+}
 void idSysLocal::FPU_EnableExceptions( int exceptions ) {
 	Sys_FPU_EnableExceptions( exceptions );
 }

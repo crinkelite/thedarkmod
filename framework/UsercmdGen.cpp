@@ -384,6 +384,7 @@ private:
 	static idCVar	in_toggleCrouch;
 	static idCVar	in_toggleZoom;
 	static idCVar	sensitivity;
+	static idCVar	j_sensitivity;
 	static idCVar	m_pitch;
 	static idCVar	m_yaw;
 	static idCVar	m_strafeScale;
@@ -401,6 +402,7 @@ idCVar idUsercmdGenLocal::in_toggleRun( "in_toggleRun", "0", CVAR_SYSTEM | CVAR_
 idCVar idUsercmdGenLocal::in_toggleCrouch( "in_toggleCrouch", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _movedown button toggles player crouching/standing" );
 idCVar idUsercmdGenLocal::in_toggleZoom( "in_toggleZoom", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _zoom button toggles zoom on/off" );
 idCVar idUsercmdGenLocal::sensitivity( "sensitivity", "5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse view sensitivity" );
+idCVar idUsercmdGenLocal::j_sensitivity( "j_sensitivity", "5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "joystick view sensitivity" );
 idCVar idUsercmdGenLocal::m_pitch( "m_pitch", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse pitch scale" );
 idCVar idUsercmdGenLocal::m_yaw( "m_yaw", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse yaw scale" );
 idCVar idUsercmdGenLocal::m_strafeScale( "m_strafeScale", "6.25", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse strafe movement scale" );
@@ -668,6 +670,7 @@ idUsercmdGenLocal::JoystickMove
 */
 void idUsercmdGenLocal::JoystickMove( void ) {
 	float	anglespeed;
+	int invert = -1;
 
 	if ( toggled_run.on ^ ( in_alwaysRun.GetBool() && idAsyncNetwork::IsActive() ) ) {
 		anglespeed = idMath::M_MS2SEC * USERCMD_MSEC * in_angleSpeedKey.GetFloat();
@@ -675,15 +678,29 @@ void idUsercmdGenLocal::JoystickMove( void ) {
 		anglespeed = idMath::M_MS2SEC * USERCMD_MSEC;
 	}
 
-	if ( !ButtonState( UB_STRAFE ) ) {
-		viewangles[YAW] += anglespeed * in_yawSpeed.GetFloat() * joystickAxis[AXIS_SIDE];
-		viewangles[PITCH] += anglespeed * in_pitchSpeed.GetFloat() * joystickAxis[AXIS_FORWARD];
-	} else {
-		cmd.rightmove = idMath::ClampChar( cmd.rightmove + joystickAxis[AXIS_SIDE] );
-		cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + joystickAxis[AXIS_FORWARD] );
+	viewangles[YAW] += anglespeed * ( in_yawSpeed.GetFloat() / ( j_sensitivity.GetInteger() * 3 )) * joystickAxis[RX_AXIS] * invert;
+	viewangles[PITCH] += anglespeed * ( in_pitchSpeed.GetFloat() / ( j_sensitivity.GetInteger() * 3 )) * joystickAxis[RY_AXIS];
+
+	int forward, side, up;
+	forward = 0;
+	side = 0;
+	up = 0;
+
+	if( joystickAxis[LX_AXIS] > KEY_MOVESPEED / 10 ) {
+		side += KEY_MOVESPEED;
+	}
+	if( joystickAxis[LX_AXIS] < -1 * ( KEY_MOVESPEED / 10 )) {
+		side -= KEY_MOVESPEED;
+	}
+	if( joystickAxis[LY_AXIS] > KEY_MOVESPEED / 10 ) {
+		forward -= KEY_MOVESPEED;
+	}
+	if( joystickAxis[LY_AXIS] < -1 * ( KEY_MOVESPEED / 10 )) {
+		forward += KEY_MOVESPEED;
 	}
 
-	cmd.upmove = idMath::ClampChar( cmd.upmove + joystickAxis[AXIS_UP] );
+	cmd.forwardmove = idMath::ClampChar( forward );
+	cmd.rightmove = idMath::ClampChar( side );
 }
 
 /*
@@ -1028,7 +1045,29 @@ idUsercmdGenLocal::Joystick
 ===============
 */
 void idUsercmdGenLocal::Joystick( void ) {
-	memset( joystickAxis, 0, sizeof( joystickAxis ) );
+	int i, numEvents;
+	numEvents = Sys_PollJoyAxisEvents();
+	if ( numEvents ) {
+		for( i = 0; i < numEvents; i++ ) {
+			int axis, value;
+			Sys_ReturnJoyAxisEvent( i, axis, value );
+			long double curve_value;
+			int min = 0;
+			int max = 35565;
+			long double NormalizedValue = (long double)(value - min) / (long double)(max - min);
+			curve_value = NormalizedValue * NormalizedValue;
+
+			if( NormalizedValue > 0.6 )
+			        toggled_run.SetKeyState( ButtonState( UB_SPEED ), true && idAsyncNetwork::IsActive() );
+			if( NormalizedValue < 0 )
+			        joystickAxis[axis] = curve_value * -256;
+			else
+				joystickAxis[axis] = curve_value * 256;
+
+			joystickAxis[axis] = value / 256 ;
+		}
+	}
+	Sys_EndJoyAxisEvents();
 }
 
 /*

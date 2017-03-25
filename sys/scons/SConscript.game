@@ -314,7 +314,8 @@ local_env.Append(LIBS = [
 	File('#/linux/polarssl/libpolarssl.a'),
 	File('/usr/lib32/libboost_filesystem.a'),
 	File('/usr/lib32/libboost_system.a'),
-	File('/usr/lib32/libboost_thread.a')
+	File('/usr/lib32/libboost_thread.a'),
+	File('/usr/lib32/libSDL2.so')
 ])
 
 if NO_GCH == '0':

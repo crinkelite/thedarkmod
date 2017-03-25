@@ -31,12 +31,20 @@ typedef struct poll_mouse_event_s
 	int value;
 } poll_mouse_event_t;
 
+typedef struct poll_axis_event_s
+{
+	int axis;
+	int value;
+} poll_axis_event_t;
+
 #define MAX_POLL_EVENTS 50
 #define POLL_EVENTS_HEADROOM 2 // some situations require to add several events
 static poll_keyboard_event_t poll_events_keyboard[MAX_POLL_EVENTS + POLL_EVENTS_HEADROOM];
 static int poll_keyboard_event_count;
 static poll_mouse_event_t poll_events_mouse[MAX_POLL_EVENTS + POLL_EVENTS_HEADROOM];
 static int poll_mouse_event_count;
+static poll_axis_event_t poll_events_axis[MAX_POLL_EVENTS + POLL_EVENTS_HEADROOM];
+static int poll_axis_event_count;
 
 /*
 ==========
@@ -72,6 +80,22 @@ bool Posix_AddMousePollEvent(int action, int value) {
 	return true;
 }
 
+/*
+==========
+Posix_AddAxisPollEvent
+==========
+*/
+bool Posix_AddAxisPollEvent(int axis, int value) {
+	if (poll_axis_event_count >= MAX_POLL_EVENTS + POLL_EVENTS_HEADROOM)
+		common->FatalError( "poll_axis_event_count exceeded MAX_POLL_EVENT + POLL_EVENTS_HEADROOM\n");
+	poll_events_axis[poll_axis_event_count].axis = axis;
+	poll_events_axis[poll_axis_event_count++].value = value;
+	if (poll_axis_event_count >= MAX_POLL_EVENTS) {
+		common->DPrintf("WARNING: reached MAX_POLL_EVENT poll_axis_event_count\n");
+		return false;
+	}
+	return true;
+}
 /*
 ===========================================================================
 polled from GetDirectUsercmd
@@ -125,3 +149,23 @@ void Sys_EndMouseInputEvents( void ) {
 	// moved out of the Sys_PollMouseInputEvents
 	poll_mouse_event_count = 0;
 }
+
+int Sys_PollJoyAxisEvents() {
+	Posix_PollSDLInput( );
+	return poll_axis_event_count;
+}
+
+int	Sys_ReturnJoyAxisEvent(const int n, int &axis, int &value) {
+	if (n >= poll_axis_event_count ) {
+		return 0;
+	}
+
+	axis = poll_events_axis[ n ].axis;
+	value = poll_events_axis[ n ].value;
+	return 1;
+}
+
+void Sys_EndJoyAxisEvents() {
+	poll_axis_event_count = 0;
+}
+

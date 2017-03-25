@@ -181,14 +181,32 @@ typedef enum {
 } fpuRounding_t;
 
 typedef enum {
-	AXIS_SIDE,
-	AXIS_FORWARD,
-	AXIS_UP,
-	AXIS_ROLL,
-	AXIS_YAW,
-	AXIS_PITCH,
+	LX_AXIS,
+	LY_AXIS,
+	RX_AXIS,
+	RY_AXIS,
 	MAX_JOYSTICK_AXIS
 } joystickAxis_t;
+
+typedef enum {
+	JB_SELECT,
+	JB_L3,
+	JB_R3,
+	JB_START,
+	JB_HAT_UP,
+	JB_HAT_RIGHT,
+	JB_HAT_DOWN,
+	JB_HAT_LEFT,
+	JB_TRIGGER_LEFT,
+	JB_TRIGGER_RIGHT,
+	JB_BUMPER_LEFT,
+	JB_BUMPER_RIGHT,
+	JB_FACE_N,
+	JB_FACE_E,
+	JB_FACE_S,
+	JB_FACE_W,
+	MAX_JOYSTICK_BUTTON
+} joystickButton_t;
 
 typedef enum {
 	SE_NONE,				// evTime is still valid
@@ -196,6 +214,7 @@ typedef enum {
 	SE_CHAR,				// evValue is an ascii char
 	SE_MOUSE,				// evValue and evValue2 are reletive signed x / y moves
 	SE_JOYSTICK_AXIS,		// evValue is an axis number and evValue2 is the current state (-127 to 127)
+	SE_JOYSTICK_BUTTON,
 	SE_CONSOLE				// evPtr is a char*, from typing something at a non-game console
 } sysEventType_t;
 
@@ -342,6 +361,11 @@ void			Sys_EndKeyboardInputEvents( void );
 int				Sys_PollMouseInputEvents( void );
 int				Sys_ReturnMouseInputEvent( const int n, int &action, int &value );
 void			Sys_EndMouseInputEvents( void );
+
+// joystick input polling
+int				Sys_PollJoyAxisEvents( void );
+int				Sys_ReturnJoyAxisEvent( const int n, int &axis, int &value );
+void			Sys_EndJoyAxisEvents( void );
 
 // when the console is down, or the game is about to perform a lengthy
 // operation like map loading, the system can release the mouse cursor
@@ -553,6 +577,8 @@ public:
 
 	virtual sysEvent_t		GenerateMouseButtonEvent( int button, bool down ) = 0;
 	virtual sysEvent_t		GenerateMouseMoveEvent( int deltax, int deltay ) = 0;
+	virtual sysEvent_t		GenerateJoyAxisEvent( int axis, int value ) = 0;
+	virtual sysEvent_t		GenerateJoyButtonEvent( int button, bool down ) = 0;
 
 	virtual void			OpenURL( const char *url, bool quit ) = 0;
 	virtual void			StartProcess( const char *exePath, bool quit ) = 0;

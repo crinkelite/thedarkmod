@@ -21,6 +21,7 @@
 #include "local.h"
 
 #include <pthread.h>
+#include <SDL2/SDL.h>
 
 idCVar in_mouse( "in_mouse", "1", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
 idCVar in_dgamouse( "in_dgamouse", "1", CVAR_SYSTEM | CVAR_ARCHIVE, "" );
@@ -64,6 +65,44 @@ static byte s_scantokey[128] = {
 /* 78 */ 0, 0, 0, 0, 0, 0, 0, 0
 };
 
+static byte mapjoy(int joybutton) {
+	switch(joybutton) {
+	case JB_SELECT:
+		return K_JOY1;
+	case JB_L3:
+		return K_JOY2;
+	case JB_R3:
+		return K_JOY3;
+	case JB_START:
+		return K_JOY4;
+	case JB_HAT_UP:
+		return K_JOY5;
+	case JB_HAT_RIGHT:
+		return K_JOY6;
+	case JB_HAT_DOWN:
+		return K_JOY7;
+	case JB_HAT_LEFT:
+		return K_JOY8;
+	case JB_TRIGGER_LEFT:
+		return K_JOY9;
+	case JB_TRIGGER_RIGHT:
+		return K_JOY10;
+	case JB_BUMPER_LEFT:
+		return K_JOY11;
+	case JB_BUMPER_RIGHT:
+		return K_JOY12;
+	case JB_FACE_N:
+		return K_JOY13;
+	case JB_FACE_E:
+		return K_JOY14;
+	case JB_FACE_S:
+		return K_JOY15;
+	case JB_FACE_W:
+		return K_JOY16;
+	}
+	return 0;
+}
+
 /*
 =================
 IN_Clear_f
@@ -81,6 +120,9 @@ Sys_InitInput
 void Sys_InitInput(void) {
 	int major_in_out, minor_in_out, opcode_rtrn, event_rtrn, error_rtrn;
 	bool ret;
+
+	SDL_Init(SDL_INIT_JOYSTICK);
+	SDL_Joystick * dualshock = SDL_JoystickOpen(0);
 
 	common->Printf( "\n------- Input Initialization -------\n" );
 	assert( dpy );
@@ -319,6 +361,36 @@ static bool Sys_XRepeatPress( XEvent *event ) {
 
 	return repeated;
 }
+/*
+=========================
+Posix_PollSDLInput
+========================
+*/
+
+void Posix_PollSDLInput() {
+
+	SDL_Event ev;
+
+	while( SDL_PollEvent( &ev ) ) {
+		switch( ev.type ) {
+			case SDL_JOYAXISMOTION:
+				if( ev.jaxis.axis < MAX_JOYSTICK_AXIS )
+				{
+					Posix_AddAxisPollEvent( ev.jaxis.axis, ev.jaxis.value );
+					break;
+				}
+			case SDL_JOYBUTTONDOWN:
+			case SDL_JOYBUTTONUP:
+				if( ev.jbutton.button < MAX_JOYSTICK_BUTTON )
+				{
+					Posix_AddKeyboardPollEvent( mapjoy( ev.jbutton.button ), ev.jbutton.state );
+					break;
+				}
+			break;
+		}
+	}
+}
+					
 
 /*
 ==========================
