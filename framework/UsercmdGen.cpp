@@ -57,6 +57,8 @@ bool usercmd_t::operator==( const usercmd_t &rhs ) const {
 
 
 const int KEY_MOVESPEED	= 127;
+const int JOY_CREEP = KEY_MOVESPEED * 0.40f;
+const int JOY_RUN = KEY_MOVESPEED * 0.95f;
 
 /*typedef enum {
 	UB_NONE,
@@ -329,7 +331,6 @@ public:
 
 	int				ButtonState( int key );
 	int				KeyState( int key );
-
 	usercmd_t		GetDirectUsercmd( void );
 
 private:
@@ -686,21 +687,34 @@ void idUsercmdGenLocal::JoystickMove( void ) {
 	side = 0;
 	up = 0;
 
+	for( int i; i < 2; i++ ) {
+		if( abs( joystickAxis[i] ) < JOY_CREEP * KEY_MOVESPEED ) {
+			cmd.buttons |= BUTTON_5;
+			printf("%d creeping\n", i);
+		} else if ( abs( joystickAxis[i] ) > JOY_RUN * KEY_MOVESPEED ) {
+			cmd.buttons |= BUTTON_RUN;
+			printf("%d running\n", i);
+		} else
+			printf("%d walking\n", i);
+			continue;
+	}
+
 	if( joystickAxis[LX_AXIS] > KEY_MOVESPEED / 10 ) {
 		side += KEY_MOVESPEED;
+		cmd.rightmove = idMath::ClampChar( side );
 	}
 	if( joystickAxis[LX_AXIS] < -1 * ( KEY_MOVESPEED / 10 )) {
 		side -= KEY_MOVESPEED;
+		cmd.rightmove = idMath::ClampChar( side );
 	}
 	if( joystickAxis[LY_AXIS] > KEY_MOVESPEED / 10 ) {
 		forward -= KEY_MOVESPEED;
+		cmd.forwardmove = idMath::ClampChar( forward );
 	}
 	if( joystickAxis[LY_AXIS] < -1 * ( KEY_MOVESPEED / 10 )) {
 		forward += KEY_MOVESPEED;
+		cmd.forwardmove = idMath::ClampChar( forward );
 	}
-
-	cmd.forwardmove = idMath::ClampChar( forward );
-	cmd.rightmove = idMath::ClampChar( side );
 }
 
 /*
