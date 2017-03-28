@@ -57,8 +57,8 @@ bool usercmd_t::operator==( const usercmd_t &rhs ) const {
 
 
 const int KEY_MOVESPEED	= 127;
-const int JOY_CREEP = KEY_MOVESPEED * 0.40f;
-const int JOY_RUN = KEY_MOVESPEED * 0.95f;
+const float JOY_CREEP = 0.40f;
+const float JOY_RUN = 0.85f;
 
 /*typedef enum {
 	UB_NONE,
@@ -663,7 +663,6 @@ void idUsercmdGenLocal::MouseMove( void ) {
 		cmd.forwardmove = idMath::ClampChar( (int)(cmd.forwardmove - strafeMy) );
 	}
 }
-
 /*
 =================
 idUsercmdGenLocal::JoystickMove
@@ -682,40 +681,18 @@ void idUsercmdGenLocal::JoystickMove( void ) {
 	viewangles[YAW] += anglespeed * ( in_yawSpeed.GetFloat() / ( j_sensitivity.GetInteger() * 3 )) * joystickAxis[RX_AXIS] * invert;
 	viewangles[PITCH] += anglespeed * ( in_pitchSpeed.GetFloat() / ( j_sensitivity.GetInteger() * 3 )) * joystickAxis[RY_AXIS];
 
-	int forward, side, up;
-	forward = 0;
-	side = 0;
-	up = 0;
+	cmd.rightmove = idMath::ClampChar( cmd.rightmove + joystickAxis[LX_AXIS] );
+	cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + joystickAxis[LY_AXIS] * invert);
+	printf( "%d, %d", joystickAxis[0], joystickAxis[1] );
 
-	for( int i; i < 2; i++ ) {
-		if( abs( joystickAxis[i] ) < JOY_CREEP * KEY_MOVESPEED ) {
-			cmd.buttons |= BUTTON_5;
-			printf("%d creeping\n", i);
-		} else if ( abs( joystickAxis[i] ) > JOY_RUN * KEY_MOVESPEED ) {
+	for( int i = 0; i < 2; i++ ) {
+		if ( abs( joystickAxis[i] ) > ( JOY_RUN * KEY_MOVESPEED ) ) {
 			cmd.buttons |= BUTTON_RUN;
 			printf("%d running\n", i);
-		} else
-			printf("%d walking\n", i);
-			continue;
-	}
-
-	if( joystickAxis[LX_AXIS] > KEY_MOVESPEED / 10 ) {
-		side += KEY_MOVESPEED;
-		cmd.rightmove = idMath::ClampChar( side );
-	}
-	if( joystickAxis[LX_AXIS] < -1 * ( KEY_MOVESPEED / 10 )) {
-		side -= KEY_MOVESPEED;
-		cmd.rightmove = idMath::ClampChar( side );
-	}
-	if( joystickAxis[LY_AXIS] > KEY_MOVESPEED / 10 ) {
-		forward -= KEY_MOVESPEED;
-		cmd.forwardmove = idMath::ClampChar( forward );
-	}
-	if( joystickAxis[LY_AXIS] < -1 * ( KEY_MOVESPEED / 10 )) {
-		forward += KEY_MOVESPEED;
-		cmd.forwardmove = idMath::ClampChar( forward );
+		}
 	}
 }
+
 
 /*
 ==============
