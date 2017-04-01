@@ -57,8 +57,6 @@ bool usercmd_t::operator==( const usercmd_t &rhs ) const {
 
 
 const int KEY_MOVESPEED	= 127;
-const float JOY_CREEP = 0.40f;
-const float JOY_RUN = 0.85f;
 
 /*typedef enum {
 	UB_NONE,
@@ -328,7 +326,6 @@ public:
 	const char *	GetUserCommandName( int index );
 
 	void			MouseState( int *x, int *y, int *button, bool *down );
-
 	int				ButtonState( int key );
 	int				KeyState( int key );
 	usercmd_t		GetDirectUsercmd( void );
@@ -403,7 +400,7 @@ idCVar idUsercmdGenLocal::in_toggleRun( "in_toggleRun", "0", CVAR_SYSTEM | CVAR_
 idCVar idUsercmdGenLocal::in_toggleCrouch( "in_toggleCrouch", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _movedown button toggles player crouching/standing" );
 idCVar idUsercmdGenLocal::in_toggleZoom( "in_toggleZoom", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _zoom button toggles zoom on/off" );
 idCVar idUsercmdGenLocal::sensitivity( "sensitivity", "5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse view sensitivity" );
-idCVar idUsercmdGenLocal::j_sensitivity( "j_sensitivity", "5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_INTEGER, "joystick view sensitivity" );
+idCVar idUsercmdGenLocal::j_sensitivity( "j_sensitivity", "0.33", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "joystick view sensitivity" );
 idCVar idUsercmdGenLocal::m_pitch( "m_pitch", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse pitch scale" );
 idCVar idUsercmdGenLocal::m_yaw( "m_yaw", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse yaw scale" );
 idCVar idUsercmdGenLocal::m_strafeScale( "m_strafeScale", "6.25", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse strafe movement scale" );
@@ -670,7 +667,8 @@ idUsercmdGenLocal::JoystickMove
 */
 void idUsercmdGenLocal::JoystickMove( void ) {
 	float	anglespeed;
-	int invert = -1;
+	int	invert = -1;
+	int	sens = 3;
 
 	if ( toggled_run.on ^ ( in_alwaysRun.GetBool() && idAsyncNetwork::IsActive() ) ) {
 		anglespeed = idMath::M_MS2SEC * USERCMD_MSEC * in_angleSpeedKey.GetFloat();
@@ -678,19 +676,13 @@ void idUsercmdGenLocal::JoystickMove( void ) {
 		anglespeed = idMath::M_MS2SEC * USERCMD_MSEC;
 	}
 
-	viewangles[YAW] += anglespeed * ( in_yawSpeed.GetFloat() / ( j_sensitivity.GetInteger() * 3 )) * joystickAxis[RX_AXIS] * invert;
-	viewangles[PITCH] += anglespeed * ( in_pitchSpeed.GetFloat() / ( j_sensitivity.GetInteger() * 3 )) * joystickAxis[RY_AXIS];
-
+	viewangles[YAW] += anglespeed * in_yawSpeed.GetFloat() * joystickAxis[RX_AXIS] * invert * j_sensitivity.GetFloat();
+	viewangles[PITCH] += anglespeed * in_pitchSpeed.GetFloat()  * joystickAxis[RY_AXIS] * j_sensitivity.GetFloat();
 	cmd.rightmove = idMath::ClampChar( cmd.rightmove + joystickAxis[LX_AXIS] );
-	cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + joystickAxis[LY_AXIS] * invert);
-	printf( "%d, %d", joystickAxis[0], joystickAxis[1] );
+	cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + joystickAxis[LY_AXIS] * invert );
 
-	for( int i = 0; i < 2; i++ ) {
-		if ( abs( joystickAxis[i] ) > ( JOY_RUN * KEY_MOVESPEED ) ) {
-			cmd.buttons |= BUTTON_RUN;
-			printf("%d running\n", i);
-		}
-	}
+	//cmd.upmove = idMath::ClampChar( cmd.upmove + joystickAxis[RT_AXIS] );
+		
 }
 
 
@@ -718,6 +710,10 @@ void idUsercmdGenLocal::CmdButtons( void ) {
 
 	// check the run button
 	if ( toggled_run.on ^ ( in_alwaysRun.GetBool() && idAsyncNetwork::IsActive() ) ) {
+		cmd.buttons |= BUTTON_RUN;
+	}
+	if (( abs( joystickAxis[LX_AXIS] ) > 255 ) || ( abs( joystickAxis[LY_AXIS] ) > 255 ))
+	{
 		cmd.buttons |= BUTTON_RUN;
 	}
 
@@ -1036,26 +1032,22 @@ idUsercmdGenLocal::Joystick
 ===============
 */
 void idUsercmdGenLocal::Joystick( void ) {
+	//memset( joystickAxis, 0, sizeof( joystickAxis ) );
 	int i, numEvents;
 	numEvents = Sys_PollJoyAxisEvents();
 	if ( numEvents ) {
 		for( i = 0; i < numEvents; i++ ) {
 			int axis, value;
 			Sys_ReturnJoyAxisEvent( i, axis, value );
-			long double curve_value;
+			double curve_value;
 			int min = 0;
-			int max = 35565;
-			long double NormalizedValue = (long double)(value - min) / (long double)(max - min);
+			int max = 32760;
+			double NormalizedValue = (double)(value - min) / (double)(max - min);
 			curve_value = NormalizedValue * NormalizedValue;
-
-			if( NormalizedValue > 0.6 )
-			        toggled_run.SetKeyState( ButtonState( UB_SPEED ), true && idAsyncNetwork::IsActive() );
 			if( NormalizedValue < 0 )
-			        joystickAxis[axis] = curve_value * -256;
+				joystickAxis[axis] = curve_value * -256;
 			else
 				joystickAxis[axis] = curve_value * 256;
-
-			joystickAxis[axis] = value / 256 ;
 		}
 	}
 	Sys_EndJoyAxisEvents();
