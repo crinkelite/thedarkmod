@@ -5078,19 +5078,10 @@ void idPlayer::BobCycle( const idVec3 &pushVelocity ) {
 		{
 			bobmove *= 0.5f * (1 - bobFrac);
 		}
-		// crink fix this
-		if (idUsercmdGenLocal::JoyCreep())
+		if ( usercmd.forwardmove < 256 * 0.44f ) 
 		{
-			bobmove *= 0.5 * ( 1 - bobFrac );
+			bobmove *= 0.5f * ( 1 - bobFrac );
 		}
-		//if ( abs( usercmd.forwardmove ) <= ( cv_pm_creepmod.GetFloat() * 256 ) ) 
-		//{
-		//	bobmove *= 0.5 * ( 1 - bobFrac);
-		//}
-		//if ( abs( usercmd.rightmove ) <= ( cv_pm_creepmod.GetFloat() * 256 ) ) 
-		//{
-		//	bobmove *= 0.5 * ( 1 - bobFrac);
-		//}
 		// additional explanatory comments added by Crispy
 		
 		old = bobCycle;
