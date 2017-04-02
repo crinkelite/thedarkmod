@@ -400,7 +400,7 @@ idCVar idUsercmdGenLocal::in_toggleRun( "in_toggleRun", "0", CVAR_SYSTEM | CVAR_
 idCVar idUsercmdGenLocal::in_toggleCrouch( "in_toggleCrouch", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _movedown button toggles player crouching/standing" );
 idCVar idUsercmdGenLocal::in_toggleZoom( "in_toggleZoom", "0", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_BOOL, "pressing _zoom button toggles zoom on/off" );
 idCVar idUsercmdGenLocal::sensitivity( "sensitivity", "5", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse view sensitivity" );
-idCVar idUsercmdGenLocal::j_sensitivity( "j_sensitivity", "0.33", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "joystick view sensitivity" );
+idCVar idUsercmdGenLocal::j_sensitivity( "j_sensitivity", "0.005", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "joystick view sensitivity" );
 idCVar idUsercmdGenLocal::m_pitch( "m_pitch", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse pitch scale" );
 idCVar idUsercmdGenLocal::m_yaw( "m_yaw", "0.022", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse yaw scale" );
 idCVar idUsercmdGenLocal::m_strafeScale( "m_strafeScale", "6.25", CVAR_SYSTEM | CVAR_ARCHIVE | CVAR_FLOAT, "mouse strafe movement scale" );
@@ -681,8 +681,6 @@ void idUsercmdGenLocal::JoystickMove( void ) {
 	cmd.rightmove = idMath::ClampChar( cmd.rightmove + joystickAxis[LX_AXIS] );
 	cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + joystickAxis[LY_AXIS] * invert );
 
-	//cmd.upmove = idMath::ClampChar( cmd.upmove + joystickAxis[RT_AXIS] );
-		
 }
 
 

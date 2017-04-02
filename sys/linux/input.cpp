@@ -383,7 +383,12 @@ void Posix_PollSDLInput() {
 			case SDL_JOYBUTTONUP:
 				if( ev.jbutton.button < MAX_JOYSTICK_BUTTON )
 				{
-					Posix_AddKeyboardPollEvent( mapjoy( ev.jbutton.button ), ev.jbutton.state );
+					bool joystate = false;
+					if( ev.jbutton.state == 1 ) {
+						joystate = true;
+					}
+					Posix_QueEvent( SE_KEY, mapjoy( ev.jbutton.button ), ev.jbutton.state, 0, NULL);
+					Posix_AddKeyboardPollEvent( mapjoy( ev.jbutton.button ), joystate );
 					break;
 				}
 			break;
