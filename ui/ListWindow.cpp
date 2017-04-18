@@ -119,7 +119,7 @@ const char *idListWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 			key = K_DOWNARROW;
 		}
 
-		if ( key == K_MOUSE1) {
+		if ( key == K_MOUSE1 || K_JOY9 ) {
 			if (Contains(gui->CursorX(), gui->CursorY())) {
 				int cur = ( int )( ( gui->CursorY() - actualY - pixelOffset ) / vert ) + top;
 				if ( cur >= 0 && cur < listItems.Num() ) {

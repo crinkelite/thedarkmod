@@ -377,6 +377,7 @@ void Posix_PollSDLInput() {
 				if( ev.jaxis.axis < MAX_JOYSTICK_AXIS )
 				{
 					Posix_AddAxisPollEvent( ev.jaxis.axis, ev.jaxis.value );
+					Posix_QueEvent( SE_JOYSTICK_AXIS , ev.jaxis.axis, ev.jaxis.value, 0, NULL );
 					break;
 				}
 			case SDL_JOYBUTTONDOWN:
@@ -387,7 +388,7 @@ void Posix_PollSDLInput() {
 					if( ev.jbutton.state == 1 ) {
 						joystate = true;
 					}
-					Posix_QueEvent( SE_KEY, mapjoy( ev.jbutton.button ), ev.jbutton.state, 0, NULL);
+					Posix_QueEvent( SE_KEY, mapjoy( ev.jbutton.button ), ev.jbutton.state, 0, NULL );
 					Posix_AddKeyboardPollEvent( mapjoy( ev.jbutton.button ), joystate );
 					break;
 				}
