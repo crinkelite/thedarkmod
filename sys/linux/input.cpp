@@ -37,6 +37,10 @@ static bool mouse_active = false;
 static int mwx, mwy;
 static int mx = 0, my = 0;
 
+// joystick position
+static int jwx, jwy;
+static int jx = 0, jy = 0;
+
 // time mouse was last reset, we ignore the first 50ms of the mouse to allow settling of events
 static int mouse_reset_time = 0;
 #define MOUSE_RESET_DELAY 50
@@ -375,9 +379,18 @@ void Posix_PollSDLInput() {
 		switch( ev.type ) {
 			case SDL_JOYAXISMOTION:
 				if( ev.jaxis.axis < MAX_JOYSTICK_AXIS )
-				{
+					{
 					Posix_AddAxisPollEvent( ev.jaxis.axis, ev.jaxis.value );
 					Posix_QueEvent( SE_JOYSTICK_AXIS , ev.jaxis.axis, ev.jaxis.value, 0, NULL );
+					switch( ev.jaxis.axis ) {
+						case RX_AXIS:
+							jx += ev.jaxis.value;
+						case RY_AXIS:
+							jy += ev.jaxis.value;
+					}
+					Posix_QueEvent( SE_JOYSTICK_UI, jx, jy, 0, NULL );
+							
+						
 					break;
 				}
 			case SDL_JOYBUTTONDOWN:

@@ -215,6 +215,7 @@ typedef enum {
 	SE_MOUSE,				// evValue and evValue2 are reletive signed x / y moves
 	SE_JOYSTICK_AXIS,		// evValue is an axis number and evValue2 is the current state (-127 to 127)
 	SE_JOYSTICK_BUTTON,
+	SE_JOYSTICK_UI,
 	SE_CONSOLE				// evPtr is a char*, from typing something at a non-game console
 } sysEventType_t;
 

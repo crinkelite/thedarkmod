@@ -150,6 +150,16 @@ sysEvent_t idSysLocal::GenerateJoyAxisEvent( int axis, int value ) {
 	return ev;
 }
 
+sysEvent_t idSysLocal::GenerateJoyInterfaceEvent( int joyposX, joyposY ) {
+	sysEvent_t ev;
+	ev.evType = SE_JOYSTICK_UI;
+	ev.evValue = joyposX;
+	ev.evValue2 = joyposY;
+	ev.evPtrLength = 0;
+	ev.evPtr = NULL;
+	return ev;
+}
+
 sysEvent_t idSysLocal::GenerateJoyButtonEvent( int button, bool down ) {
 	sysEvent_t ev;
 	ev.evType = SE_KEY;
