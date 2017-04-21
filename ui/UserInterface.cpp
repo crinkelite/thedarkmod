@@ -347,15 +347,9 @@ const char *idUserInterfaceLocal::HandleEvent( const sysEvent_t *event, int _tim
 			cursorY = 0;
 		}
 	}
-	if ( event->evType == SE_JOYSTICK_AXIS ) {
-		switch( event->evValue ) {
-			case RX_AXIS:
-				cursorX += event->evValue2 * 0.00005;
-				break;
-			case RY_AXIS:
-				cursorY += event->evValue2 * 0.00005;
-				break;
-		}
+	if ( event->evType == SE_JOYSTICK_UI ) {
+		cursorX += event->evValue * 0.00005;
+		cursorY += event->evValue2 * 0.00005;
 		if (cursorX < 0) {
 			cursorX = 0;
 		}

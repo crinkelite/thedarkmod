@@ -243,6 +243,7 @@ void			idSysLocal::DLL_GetFileName( const char *baseName, char *dllName, int max
 sysEvent_t		idSysLocal::GenerateMouseButtonEvent( int button, bool down ) { sysEvent_t ev; memset( &ev, 0, sizeof( ev ) ); return ev; }
 sysEvent_t		idSysLocal::GenerateMouseMoveEvent( int deltax, int deltay ) { sysEvent_t ev; memset( &ev, 0, sizeof( ev ) ); return ev; }
 sysEvent_t		idSysLocal::GenerateJoyAxisEvent( int axis, int value ) { sysEvent_t ev; memset ( &ev, 0, sizeof( ev ) );  return ev; }
+sysEvent_t		idSysLocal::GenerateJoyInterfaceEvent( int joyposX, int joyposY ) { sysEvent_t ev; memset ( &ev, 0, sizeof( ev ) );  return ev; }
 sysEvent_t		idSysLocal::GenerateJoyButtonEvent( int button, bool down ) { sysEvent_t ev; memset( &ev, 0, sizeof( ev ) ); return ev; }
 
 void			idSysLocal::OpenURL( const char *url, bool quit ) { }

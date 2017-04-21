@@ -60,6 +60,7 @@ public:
 	virtual sysEvent_t		GenerateMouseButtonEvent( int button, bool down );
 	virtual sysEvent_t		GenerateMouseMoveEvent( int deltax, int deltay );
 	virtual sysEvent_t		GenerateJoyAxisEvent( int axis, int value );
+	virtual sysEvent_t		GenerateJoyInterfaceEvent( int joyposX, int joyposY );
 	virtual sysEvent_t		GenerateJoyButtonEvent( int button, bool state );
 
 	virtual void			OpenURL( const char *url, bool quit );

@@ -384,14 +384,13 @@ void Posix_PollSDLInput() {
 					Posix_QueEvent( SE_JOYSTICK_AXIS , ev.jaxis.axis, ev.jaxis.value, 0, NULL );
 					switch( ev.jaxis.axis ) {
 						case RX_AXIS:
-							jx += ev.jaxis.value;
+							jx = ev.jaxis.value;
+						break;
 						case RY_AXIS:
-							jy += ev.jaxis.value;
+							jy = ev.jaxis.value;
+						break;
 					}
 					Posix_QueEvent( SE_JOYSTICK_UI, jx, jy, 0, NULL );
-							
-						
-					break;
 				}
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:

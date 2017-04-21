@@ -579,6 +579,7 @@ public:
 	virtual sysEvent_t		GenerateMouseButtonEvent( int button, bool down ) = 0;
 	virtual sysEvent_t		GenerateMouseMoveEvent( int deltax, int deltay ) = 0;
 	virtual sysEvent_t		GenerateJoyAxisEvent( int axis, int value ) = 0;
+	virtual sysEvent_t		GenerateJoyInterfaceEvent( int joyposX, int joyposY ) = 0;
 	virtual sysEvent_t		GenerateJoyButtonEvent( int button, bool down ) = 0;
 
 	virtual void			OpenURL( const char *url, bool quit ) = 0;

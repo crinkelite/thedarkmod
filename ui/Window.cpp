@@ -911,7 +911,7 @@ const char *idWindow::HandleEvent(const sysEvent_t *event, bool *updateVisuals) 
 				}
 			}
 
-		} else if (event->evType == SE_MOUSE || SE_JOYSTICK_AXIS ) {
+		} else if (event->evType == SE_MOUSE || SE_JOYSTICK_UI ) {
 			if (updateVisuals) {
 				*updateVisuals = true;
 			}
