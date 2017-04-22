@@ -720,7 +720,7 @@ const char *idWindow::HandleEvent(const sysEvent_t *event, bool *updateVisuals) 
 				*updateVisuals = true;
 			}
 
-			if (event->evValue == K_MOUSE1) {
+			if (event->evValue == K_MOUSE1 || K_JOY12 ) {
 
 				if (!event->evValue2 && GetCaptureChild()) {
 					GetCaptureChild()->LoseCapture();

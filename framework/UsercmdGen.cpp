@@ -326,6 +326,7 @@ public:
 	const char *	GetUserCommandName( int index );
 
 	void			MouseState( int *x, int *y, int *button, bool *down );
+	void			JoyState( int *x, int *y, int *button, bool *down );
 	int				ButtonState( int key );
 	int				KeyState( int key );
 	usercmd_t		GetDirectUsercmd( void );
@@ -367,8 +368,11 @@ private:
 	usercmd_t		buffered[MAX_BUFFERED_USERCMD];
 
 	int				continuousMouseX, continuousMouseY;	// for gui event generatioin, never zerod
+	int				continuousJoyX, continuousJoyY;
 	int				mouseButton;						// for gui event generatioin
 	bool			mouseDown;
+	int				joyButton;
+	bool			joyDown;
 
 	int				mouseDx, mouseDy;	// added to by mouse events
 	int				joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
@@ -798,6 +802,8 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 
 	cmd.mx = continuousMouseX;
 	cmd.my = continuousMouseY;
+	cmd.jx = continuousJoyX;
+	cmd.jy = continuousJoyY;
 
 	flags = cmd.flags;
 	impulse = cmd.impulse;
@@ -1037,6 +1043,14 @@ void idUsercmdGenLocal::Joystick( void ) {
 		for( i = 0; i < numEvents; i++ ) {
 			int axis, value;
 			Sys_ReturnJoyAxisEvent( i, axis, value );
+			switch( axis ) {
+				case RX_AXIS:
+					continuousJoyX = value;
+					break;
+				case RY_AXIS:
+					continuousJoyY = value;
+					break;
+			}
 			double curve_value;
 			int min = 0;
 			int max = 32760;
@@ -1095,6 +1109,13 @@ void idUsercmdGenLocal::MouseState( int *x, int *y, int *button, bool *down ) {
 	*y = continuousMouseY;
 	*button = mouseButton;
 	*down = mouseDown;
+}
+
+void idUsercmdGenLocal::JoyState( int *x, int *y, int *button, bool *down ) {
+	*x = continuousJoyX;
+	*y = continuousJoyY;
+	*button = joyButton;
+	*down = joyDown;
 }
 
 /*

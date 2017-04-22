@@ -265,6 +265,9 @@ public:
 	short		angles[3];						// view angles
 	short		mx;								// mouse delta x
 	short		my;								// mouse delta y
+	short		jx;
+	short		jy;
+
 	signed char impulse;						// impulse command
 	byte		flags;							// additional flags
 	int			sequence;						// just for debugging
@@ -321,6 +324,8 @@ public:
 
 	// Continuously modified, never reset. For full screen guis.
 	virtual void		MouseState( int *x, int *y, int *button, bool *down ) = 0;
+
+	virtual void		JoyState( int *x, int *y, int *button, bool *down ) = 0;
 
 	// Directly sample a button.
 	virtual int			ButtonState( int key ) = 0;

@@ -390,7 +390,6 @@ void Posix_PollSDLInput() {
 							jy = ev.jaxis.value;
 						break;
 					}
-					Posix_QueEvent( SE_JOYSTICK_UI, jx, jy, 0, NULL );
 				}
 			case SDL_JOYBUTTONDOWN:
 			case SDL_JOYBUTTONUP:
@@ -406,6 +405,7 @@ void Posix_PollSDLInput() {
 				}
 			break;
 		}
+	Posix_QueEvent( SE_JOYSTICK_UI, jx, jy, 0, NULL );
 	}
 }
 					
