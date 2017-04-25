@@ -6398,6 +6398,10 @@ void idPlayer::EvaluateControls( void )
 		PerformImpulse( usercmd.impulse );
 	}
 
+	if ( usercmd.joymod && usercmd.ljx != 0 && usercmd.ljy != 0 && sqrt( ( usercmd.ljx ^2 ) + ( usercmd.ljy ^2 ) ) > 100 ) {
+		physicsObj.ToggleLean( atan(usercmd.ljy / usercmd.ljx) * 180 / idMath::PI );
+	}
+
 	scoreBoardOpen = ( ( usercmd.buttons & BUTTON_SCORES ) != 0 || forceScoreBoard );
 
 	oldFlags = usercmd.flags;

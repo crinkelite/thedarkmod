@@ -368,7 +368,7 @@ private:
 	usercmd_t		buffered[MAX_BUFFERED_USERCMD];
 
 	int				continuousMouseX, continuousMouseY;	// for gui event generatioin, never zerod
-	int				continuousJoyX, continuousJoyY;
+	int				continuousJoyLX, continuousJoyLY, continuousJoyRX, continuousJoyRY;
 	int				mouseButton;						// for gui event generatioin
 	bool			mouseDown;
 	int				joyButton;
@@ -672,7 +672,6 @@ idUsercmdGenLocal::JoystickMove
 void idUsercmdGenLocal::JoystickMove( void ) {
 	float	anglespeed;
 	int	invert = -1;
-	int	sens = 3;
 
 	if ( toggled_run.on ^ ( in_alwaysRun.GetBool() && idAsyncNetwork::IsActive() ) ) {
 		anglespeed = idMath::M_MS2SEC * USERCMD_MSEC * in_angleSpeedKey.GetFloat();
@@ -682,9 +681,13 @@ void idUsercmdGenLocal::JoystickMove( void ) {
 
 	viewangles[YAW] += anglespeed * in_yawSpeed.GetFloat() * joystickAxis[RX_AXIS] * invert * j_sensitivity.GetFloat();
 	viewangles[PITCH] += anglespeed * in_pitchSpeed.GetFloat()  * joystickAxis[RY_AXIS] * j_sensitivity.GetFloat();
-	cmd.rightmove = idMath::ClampChar( cmd.rightmove + joystickAxis[LX_AXIS] );
-	cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + joystickAxis[LY_AXIS] * invert );
-
+	if ( !ButtonState( (UserCmdButton)(UB_IMPULSE53) )) {
+		cmd.joymod = false;
+		cmd.rightmove = idMath::ClampChar( cmd.rightmove + joystickAxis[LX_AXIS] );
+		cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + joystickAxis[LY_AXIS] * invert );
+	} else {
+		cmd.joymod = true;
+	}
 }
 
 
@@ -802,9 +805,10 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 
 	cmd.mx = continuousMouseX;
 	cmd.my = continuousMouseY;
-	cmd.jx = continuousJoyX;
-	cmd.jy = continuousJoyY;
-
+	cmd.rjx = continuousJoyRX;
+	cmd.rjy = continuousJoyRY;
+	cmd.ljx = continuousJoyLX;
+	cmd.ljy = continuousJoyLY;
 	flags = cmd.flags;
 	impulse = cmd.impulse;
 
@@ -1038,17 +1042,24 @@ idUsercmdGenLocal::Joystick
 void idUsercmdGenLocal::Joystick( void ) {
 	//memset( joystickAxis, 0, sizeof( joystickAxis ) );
 	int i, numEvents;
+	cmd.joymod = false;
 	numEvents = Sys_PollJoyAxisEvents();
 	if ( numEvents ) {
 		for( i = 0; i < numEvents; i++ ) {
 			int axis, value;
 			Sys_ReturnJoyAxisEvent( i, axis, value );
 			switch( axis ) {
+				case LX_AXIS:
+					continuousJoyLX = value;
+					break;
+				case LY_AXIS:
+					continuousJoyLY = value;
+					break;
 				case RX_AXIS:
-					continuousJoyX = value;
+					continuousJoyRX = value;
 					break;
 				case RY_AXIS:
-					continuousJoyY = value;
+					continuousJoyRY = value;
 					break;
 			}
 			double curve_value;
@@ -1112,8 +1123,8 @@ void idUsercmdGenLocal::MouseState( int *x, int *y, int *button, bool *down ) {
 }
 
 void idUsercmdGenLocal::JoyState( int *x, int *y, int *button, bool *down ) {
-	*x = continuousJoyX;
-	*y = continuousJoyY;
+	*x = continuousJoyRX;
+	*y = continuousJoyRY;
 	*button = joyButton;
 	*down = joyDown;
 }
