@@ -843,6 +843,7 @@ public:
 	*
 	*/
 	void ToggleLean(float leanYawAngleDegrees);
+	void JoyLean( float leanYawAngleDegrees, float joyLeanStretch );
 
 	/*!
 	* This method tests if the player is in the middle of a leaning

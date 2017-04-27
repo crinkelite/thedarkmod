@@ -4570,6 +4570,58 @@ void idPhysics_Player::ToggleLean(float leanYawAngleDegrees)
 	}
 }
 
+void idPhysics_Player::JoyLean( float leanYawAngleDegrees, float joyLeanStretch )
+{
+	//if (m_CurrentLeanTiltDegrees < 0.0001) // prevent floating point compare errors
+	if (m_CurrentLeanTiltDegrees < 0.00001) // prevent floating point compare errors
+	{
+		// Start the lean
+		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+		m_leanYawAngleDegrees = leanYawAngleDegrees;
+
+		// Hack: Use different values for forward/backward lean than side/side
+		if( leanYawAngleDegrees == 90.0f || leanYawAngleDegrees == -90.0f )
+		{
+			m_leanTime = cv_pm_lean_forward_time.GetFloat();
+			m_leanMoveEndTilt = cv_pm_lean_forward_angle.GetFloat();
+			m_leanMoveMaxStretch = abs(joyLeanStretch);
+			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
+		}
+		else
+		{
+			m_leanTime = cv_pm_lean_time.GetFloat();
+			m_leanMoveEndTilt = cv_pm_lean_angle.GetFloat();
+			m_leanMoveMaxStretch = joyLeanStretch;
+			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
+
+		}
+		//this crash ^^
+
+		m_b_leanFinished = false;
+
+		DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("Joystick Lean starting lean\r");
+	}
+	else 
+	{
+		if (m_leanTime > 0 && m_leanMoveEndTilt == 0)
+		{
+			// We are already un-leaning
+			return;
+		}
+
+		// End the lean
+		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+		m_leanTime = cv_pm_lean_forward_time.GetFloat();
+		m_leanMoveEndTilt = 0.0;
+		m_b_leanFinished = false;
+
+		// greebo: Leave the rest of the variables as they are
+		// to avoid view-jumping issues due to leaning back.
+
+		DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("ToggleLean ending lean\r");
+	}
+}
+
 //----------------------------------------------------------------------
 
 bool idPhysics_Player::IsLeaning()

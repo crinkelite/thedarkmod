@@ -6398,8 +6398,11 @@ void idPlayer::EvaluateControls( void )
 		PerformImpulse( usercmd.impulse );
 	}
 
-	if ( usercmd.joymod && usercmd.ljx != 0 && usercmd.ljy != 0 && sqrt( ( usercmd.ljx ^2 ) + ( usercmd.ljy ^2 ) ) > 100 ) {
-		physicsObj.ToggleLean( atan(usercmd.ljy / usercmd.ljx) * 180 / idMath::PI );
+	if ( usercmd.joymod && ( usercmd.ljx < -1 || usercmd.ljx > 1 ) && usercmd.ljy < -1 ) {
+		float angle = atan(abs(usercmd.ljy) / abs(usercmd.ljx)) * 180 / idMath::PI;
+		int magnitude = sqrt(( usercmd.ljx * usercmd.ljx ) + ( usercmd.ljy * usercmd.ljy ));
+		float Normal = (float)(magnitude) / cv_pm_lean_stretch.GetFloat();
+		physicsObj.JoyLean( angle, Normal ); 
 	}
 
 	scoreBoardOpen = ( ( usercmd.buttons & BUTTON_SCORES ) != 0 || forceScoreBoard );
