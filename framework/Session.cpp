@@ -2119,7 +2119,7 @@ idSessionLocal::ProcessEvent
 */
 bool idSessionLocal::ProcessEvent( const sysEvent_t *event ) {
 	// hitting escape anywhere brings up the menu
-	if ( !guiActive && event->evType == SE_KEY && event->evValue2 == 1 && event->evValue == K_ESCAPE ) {
+	if ( !guiActive && event->evType == SE_KEY && event->evValue2 == 1 && ( event->evValue ==  K_ESCAPE || event->evValue == K_JOY4 )) {
 		console->Close();
 		if ( game ) {
 			idUserInterface	*gui = NULL;

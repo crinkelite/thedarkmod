@@ -1064,7 +1064,7 @@ void idUsercmdGenLocal::Joystick( void ) {
 			}
 			double curve_value;
 			int min = 0;
-			int max = 32760;
+			int max = 32768;
 			double NormalizedValue = (double)(value - min) / (double)(max - min);
 			curve_value = NormalizedValue * NormalizedValue;
 			if( NormalizedValue < 0 )

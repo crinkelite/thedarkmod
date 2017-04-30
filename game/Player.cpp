@@ -6401,8 +6401,16 @@ void idPlayer::EvaluateControls( void )
 	if ( usercmd.joymod && ( usercmd.ljx < -1 || usercmd.ljx > 1 ) && usercmd.ljy < -1 ) {
 		float angle = atan(abs(usercmd.ljy) / abs(usercmd.ljx)) * 180 / idMath::PI;
 		int magnitude = sqrt(( usercmd.ljx * usercmd.ljx ) + ( usercmd.ljy * usercmd.ljy ));
-		float Normal = (float)(magnitude) / cv_pm_lean_stretch.GetFloat();
-		physicsObj.JoyLean( angle, Normal ); 
+		int max, min;
+		max = 32768;
+		min = 0;
+		float Normal = (float)(magnitude - min)/(double)(max - min); 
+		bool joystick_lean;
+		if( Normal > 0.0001f ) {
+			joystick_lean = true;
+		}
+		
+		physicsObj.JoyLean( angle, Normal, joystick_lean ); 
 	}
 
 	scoreBoardOpen = ( ( usercmd.buttons & BUTTON_SCORES ) != 0 || forceScoreBoard );

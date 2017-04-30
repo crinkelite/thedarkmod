@@ -4570,7 +4570,7 @@ void idPhysics_Player::ToggleLean(float leanYawAngleDegrees)
 	}
 }
 
-void idPhysics_Player::JoyLean( float leanYawAngleDegrees, float joyLeanStretch )
+void idPhysics_Player::JoyLean( float leanYawAngleDegrees, float joyLeanStretch, bool joystick_lean )
 {
 	//if (m_CurrentLeanTiltDegrees < 0.0001) // prevent floating point compare errors
 	if (m_CurrentLeanTiltDegrees < 0.00001) // prevent floating point compare errors
@@ -4595,7 +4595,6 @@ void idPhysics_Player::JoyLean( float leanYawAngleDegrees, float joyLeanStretch 
 			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
 
 		}
-		//this crash ^^
 
 		m_b_leanFinished = false;
 
