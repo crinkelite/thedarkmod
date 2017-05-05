@@ -736,6 +736,8 @@ protected:
 	*/
 	bool m_b_leanFinished;
 
+	bool m_b_joyLeanMod;
+
 	/*!
 	* How long will the current phase of the leaning operation take?
 	* Uses milliseconds and counts down to 0
@@ -843,7 +845,7 @@ public:
 	*
 	*/
 	void ToggleLean(float leanYawAngleDegrees);
-	void JoyLean( float leanYawAngleDegrees, float joyLeanStretch, bool joystick_lean );
+	void JoyLean( int ljx, int ljy );
 
 	/*!
 	* This method tests if the player is in the middle of a leaning

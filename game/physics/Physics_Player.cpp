@@ -2810,6 +2810,7 @@ idPhysics_Player::idPhysics_Player( void )
 	m_CurrentLeanTiltDegrees = 0.0;
 	m_CurrentLeanStretch = 0.0;
 	m_b_leanFinished = true;
+	m_b_joyLeanMod = false;
 	m_leanMoveStartTilt = 0.0;
 	m_leanMoveEndTilt = 0.0;
 	m_leanMoveMaxAngle = 0.0;
@@ -4570,39 +4571,47 @@ void idPhysics_Player::ToggleLean(float leanYawAngleDegrees)
 	}
 }
 
-void idPhysics_Player::JoyLean( float leanYawAngleDegrees, float joyLeanStretch, bool joystick_lean )
+//----------------------------------------------------------------------
+void idPhysics_Player::JoyLean( int ljx, int ljy )
 {
-	//if (m_CurrentLeanTiltDegrees < 0.0001) // prevent floating point compare errors
-	if (m_CurrentLeanTiltDegrees < 0.00001) // prevent floating point compare errors
+	float leanYawAngleDegrees = atan(ljy / ljx) * 180 / idMath::PI;
+	if( m_CurrentLeanTiltDegrees < 0.00001 )
 	{
-		// Start the lean
 		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
 		m_leanYawAngleDegrees = leanYawAngleDegrees;
-
-		// Hack: Use different values for forward/backward lean than side/side
+		
 		if( leanYawAngleDegrees == 90.0f || leanYawAngleDegrees == -90.0f )
 		{
 			m_leanTime = cv_pm_lean_forward_time.GetFloat();
 			m_leanMoveEndTilt = cv_pm_lean_forward_angle.GetFloat();
-			m_leanMoveMaxStretch = abs(joyLeanStretch);
-			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
+			m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
+			m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
 		}
 		else
 		{
-			m_leanTime = cv_pm_lean_time.GetFloat();
-			m_leanMoveEndTilt = cv_pm_lean_angle.GetFloat();
-			m_leanMoveMaxStretch = joyLeanStretch;
+			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+			m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
 			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
-
+			int square, magnitude;
+			square = ( ljx * ljx ) + ( ljy * ljy );
+			magnitude = sqrt( square );
+			int max, min;
+			max = 32768;
+			min = 0;
+			float Normal = (float)(magnitude - min)/(float)(max - min); 
+			bool joystick_lean;
+			if( Normal > 0.0001f ) {
+				joystick_lean = true;
+				m_b_joyLeanMod = true;
+			}
+			m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
+			m_b_leanFinished = false;
+			m_leanTime = cv_pm_lean_forward_time.GetFloat();
 		}
-
-		m_b_leanFinished = false;
-
-		DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("Joystick Lean starting lean\r");
 	}
 	else 
 	{
-		if (m_leanTime > 0 && m_leanMoveEndTilt == 0)
+		if ( !m_b_joyLeanMod  && m_leanMoveEndTilt == 0)
 		{
 			// We are already un-leaning
 			return;
@@ -4620,8 +4629,6 @@ void idPhysics_Player::JoyLean( float leanYawAngleDegrees, float joyLeanStretch,
 		DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("ToggleLean ending lean\r");
 	}
 }
-
-//----------------------------------------------------------------------
 
 bool idPhysics_Player::IsLeaning()
 {
@@ -4772,7 +4779,7 @@ void idPhysics_Player::LeanMove()
 
 		// Update lean time
 		m_leanTime -= framemsec;
-		if (m_leanTime <= 0.0)
+		if (m_leanTime <= 0.0 )
 		{
 			m_leanTime = 0.0;
 			m_b_leanFinished = true;
@@ -4822,6 +4829,7 @@ void idPhysics_Player::LeanMove()
 	{
 		UpdateLeanDoor();
 	}
+	m_b_joyLeanMod = false;
 
 	// TODO: Update lean radius if player is crouching/uncrouching
 }
