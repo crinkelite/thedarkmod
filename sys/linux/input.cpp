@@ -405,7 +405,7 @@ void Posix_PollSDLInput() {
 				}
 			break;
 		}
-	Posix_QueEvent( SE_JOYSTICK_UI, jx, jy, 0, NULL );
+	//Posix_QueEvent( SE_JOYSTICK_UI, jx, jy, 0, NULL );
 	}
 }
 					

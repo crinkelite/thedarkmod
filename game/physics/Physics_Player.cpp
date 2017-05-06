@@ -4574,59 +4574,42 @@ void idPhysics_Player::ToggleLean(float leanYawAngleDegrees)
 //----------------------------------------------------------------------
 void idPhysics_Player::JoyLean( int ljx, int ljy )
 {
-	float leanYawAngleDegrees = atan(ljy / ljx) * 180 / idMath::PI;
-	if( m_CurrentLeanTiltDegrees < 0.00001 )
-	{
-		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+
+	float leanYawAngleDegrees = atan( abs( ljy ) / abs( ljx )) * 180 / idMath::PI;
+	if( ljx < 0 ) {
 		m_leanYawAngleDegrees = leanYawAngleDegrees;
-		
-		if( leanYawAngleDegrees == 90.0f || leanYawAngleDegrees == -90.0f )
-		{
-			m_leanTime = cv_pm_lean_forward_time.GetFloat();
-			m_leanMoveEndTilt = cv_pm_lean_forward_angle.GetFloat();
-			m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
-			m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
-		}
-		else
-		{
-			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
-			m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
-			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
-			int square, magnitude;
-			square = ( ljx * ljx ) + ( ljy * ljy );
-			magnitude = sqrt( square );
-			int max, min;
-			max = 32768;
-			min = 0;
-			float Normal = (float)(magnitude - min)/(float)(max - min); 
-			bool joystick_lean;
-			if( Normal > 0.0001f ) {
-				joystick_lean = true;
-				m_b_joyLeanMod = true;
-			}
-			m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
-			m_b_leanFinished = false;
-			m_leanTime = cv_pm_lean_forward_time.GetFloat();
-		}
+	} 
+	else if ( ljx > 0 ) {
+		m_leanYawAngleDegrees = 180.0f - leanYawAngleDegrees;
+	} 
+	else {
+		m_leanYawAngleDegrees = 90.0f;
 	}
-	else 
+	m_b_joyLeanMod = true;
+	int square, magnitude;
+	square = ( ljx * ljx ) + ( ljy * ljy );
+	magnitude = sqrt( square );
+	int max, min;
+	max = 32768;
+	min = 0;
+	float Normal = (float)(magnitude - min)/(float)(max - min); 
+
+	if( leanYawAngleDegrees > 60.0f || leanYawAngleDegrees < 120.0f )
 	{
-		if ( !m_b_joyLeanMod  && m_leanMoveEndTilt == 0)
-		{
-			// We are already un-leaning
-			return;
-		}
-
-		// End the lean
-		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
 		m_leanTime = cv_pm_lean_forward_time.GetFloat();
-		m_leanMoveEndTilt = 0.0;
+		m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
+		m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
+		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+		m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
 		m_b_leanFinished = false;
-
-		// greebo: Leave the rest of the variables as they are
-		// to avoid view-jumping issues due to leaning back.
-
-		DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("ToggleLean ending lean\r");
+	}
+	else
+	{
+		m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
+		m_leanTime = cv_pm_lean_time.GetFloat();
+		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+		m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
+		m_b_leanFinished = false;
 	}
 }
 
