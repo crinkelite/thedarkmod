@@ -720,7 +720,7 @@ const char *idWindow::HandleEvent(const sysEvent_t *event, bool *updateVisuals) 
 				*updateVisuals = true;
 			}
 
-			if (event->evValue == K_MOUSE1 || K_JOY12 ) {
+			if (event->evValue == K_MOUSE1 || event->evValue == K_JOY12 ) {
 
 				if (!event->evValue2 && GetCaptureChild()) {
 					GetCaptureChild()->LoseCapture();
@@ -911,7 +911,7 @@ const char *idWindow::HandleEvent(const sysEvent_t *event, bool *updateVisuals) 
 				}
 			}
 
-		} else if (event->evType == SE_MOUSE || SE_JOYSTICK_UI ) {
+		} else if (event->evType == SE_MOUSE || event->evType == SE_JOYSTICK_UI ) {
 			if (updateVisuals) {
 				*updateVisuals = true;
 			}

@@ -4574,43 +4574,56 @@ void idPhysics_Player::ToggleLean(float leanYawAngleDegrees)
 //----------------------------------------------------------------------
 void idPhysics_Player::JoyLean( int ljx, int ljy )
 {
+	if( m_CurrentLeanTiltDegrees < 0.00001 ) {
+		float leanYawAngleDegrees = atan( abs( ljy ) / abs( ljx )) * 180 / idMath::PI;
+		if( ljx < 0 ) {
+			m_leanYawAngleDegrees = leanYawAngleDegrees;
+		} 
+		else if ( ljx > 0 ) {
+			m_leanYawAngleDegrees = 180.0f - leanYawAngleDegrees;
+		} 
+		else {
+			m_leanYawAngleDegrees = 90.0f;
+		}
+		m_b_joyLeanMod = true;
+		int square, magnitude;
+		square = ( ljx * ljx ) + ( ljy * ljy );
+		magnitude = sqrt( square );
+		int max, min;
+		max = 32768;
+		min = 0;
+		float Normal = (float)(magnitude - min)/(float)(max - min); 
 
-	float leanYawAngleDegrees = atan( abs( ljy ) / abs( ljx )) * 180 / idMath::PI;
-	if( ljx < 0 ) {
-		m_leanYawAngleDegrees = leanYawAngleDegrees;
-	} 
-	else if ( ljx > 0 ) {
-		m_leanYawAngleDegrees = 180.0f - leanYawAngleDegrees;
-	} 
-	else {
-		m_leanYawAngleDegrees = 90.0f;
-	}
-	m_b_joyLeanMod = true;
-	int square, magnitude;
-	square = ( ljx * ljx ) + ( ljy * ljy );
-	magnitude = sqrt( square );
-	int max, min;
-	max = 32768;
-	min = 0;
-	float Normal = (float)(magnitude - min)/(float)(max - min); 
-
-	if( leanYawAngleDegrees > 60.0f || leanYawAngleDegrees < 120.0f )
-	{
-		m_leanTime = cv_pm_lean_forward_time.GetFloat();
-		m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
-		m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
-		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
-		m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
-		m_b_leanFinished = false;
+		if( leanYawAngleDegrees > 60.0f || leanYawAngleDegrees < 120.0f )
+		{
+			m_leanTime = cv_pm_lean_forward_time.GetFloat();
+			m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
+			m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
+			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+			m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
+			m_b_leanFinished = false;
+		}
+		else
+		{
+			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
+			m_leanTime = cv_pm_lean_time.GetFloat();
+			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
+			m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
+			m_b_leanFinished = false;
+		}
 	}
 	else
 	{
-		m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
-		m_leanTime = cv_pm_lean_time.GetFloat();
+		if( m_leanTime > 0 && m_leanMoveEndTilt == 0 )
+		{
+			return;
+		}
 		m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
-		m_leanMoveEndTilt = Normal * m_leanMoveMaxAngle;
+		m_leanTime = cv_pm_lean_forward_time.GetFloat();
+		m_leanMoveEndTilt = 0.0;
 		m_b_leanFinished = false;
-	}
+		DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("JoyLean ending lean\r");
+	}	
 }
 
 bool idPhysics_Player::IsLeaning()
@@ -4800,20 +4813,19 @@ void idPhysics_Player::LeanMove()
 
 	// If player is leaned at all, do an additional clip test and unlean them
 	// In case they lean and walk into something, or a moveable moves into them, etc.
-	if( m_CurrentLeanTiltDegrees != 0.0	&& TestLeanClip() )
+	if( m_CurrentLeanTiltDegrees != 0.0	&& TestLeanClip() && m_b_joyLeanMod == false )
 	{
 		DM_LOG(LC_MOVEMENT,LT_DEBUG)LOGSTRING("Leaned player clipped solid, unleaning to valid position \r");
 
 		UnleanToValidPosition();
 	}
+	m_b_joyLeanMod = false;
 
 	// Lean door test
 	if( IsLeaning() )
 	{
 		UpdateLeanDoor();
 	}
-	m_b_joyLeanMod = false;
-
 	// TODO: Update lean radius if player is crouching/uncrouching
 }
 
