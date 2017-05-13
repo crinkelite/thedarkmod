@@ -1048,25 +1048,29 @@ void idUsercmdGenLocal::Joystick( void ) {
 		for( i = 0; i < numEvents; i++ ) {
 			int axis, value;
 			Sys_ReturnJoyAxisEvent( i, axis, value );
-			switch( axis ) {
-				case LX_AXIS:
-					continuousJoyLX = value;
-					break;
-				case LY_AXIS:
-					continuousJoyLY = value;
-					break;
-				case RX_AXIS:
-					continuousJoyRX = value;
-					break;
-				case RY_AXIS:
-					continuousJoyRY = value;
-					break;
-			}
 			double curve_value;
 			int min = 0;
 			int max = 32768;
 			double NormalizedValue = (double)(value - min) / (double)(max - min);
 			curve_value = NormalizedValue * NormalizedValue;
+			switch( axis ) {
+				case LX_AXIS:
+					continuousJoyLX = value;
+					cmd.ljmag = NormalizedValue;
+					break;
+				case LY_AXIS:
+					continuousJoyLY = value;
+					cmd.ljmag = NormalizedValue;
+					break;
+				case RX_AXIS:
+					continuousJoyRX = value;
+					cmd.rjmag = NormalizedValue;
+					break;
+				case RY_AXIS:
+					continuousJoyRY = value;
+					cmd.rjmag = NormalizedValue;
+					break;
+			}
 			if( NormalizedValue < 0 )
 				joystickAxis[axis] = curve_value * -256;
 			else

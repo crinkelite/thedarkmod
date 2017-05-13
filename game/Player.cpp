@@ -6396,10 +6396,8 @@ void idPlayer::EvaluateControls( void )
 	{
 		PerformImpulse( usercmd.impulse );
 	}
-
-	if ( usercmd.joymod && ( usercmd.ljx < -1 || usercmd.ljx > 1 ) && usercmd.ljy < -1 ) {
-		physicsObj.JoyLean( ( usercmd.ljx * -1 ), usercmd.ljy );
-	}
+	bool mod = usercmd.joymod;
+	physicsObj.JoyLean( usercmd.ljx, usercmd.ljy, mod );
 
 	scoreBoardOpen = ( ( usercmd.buttons & BUTTON_SCORES ) != 0 || forceScoreBoard );
 

@@ -270,6 +270,12 @@ public:
 	short		ljy;
 	short		rjx;
 	short		rjy;
+
+	float		ljmag;
+	float		ljang;
+	float		rjmag;
+	float		rjang;
+
 	bool		joymod;
 	signed char impulse;						// impulse command
 	byte		flags;							// additional flags
