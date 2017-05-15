@@ -816,7 +816,6 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 
 //=====================================================================
 
-
 /*
 ================
 idUsercmdGenLocal::CommandStringUsercmdData
@@ -1076,9 +1075,17 @@ void idUsercmdGenLocal::Joystick( void ) {
 			else
 				joystickAxis[axis] = curve_value * 256;
 		}
+		if( continuousJoyLX != 0 && continuousJoyLY != 0 ) { 
+			cmd.ljang = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
+			int square, magnitude;
+			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
+			magnitude = sqrt( square );
+			cmd.ljmag = float(magnitude) / 32768;
+		}
 	}
 	Sys_EndJoyAxisEvents();
 }
+
 
 /*
 ================

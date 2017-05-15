@@ -4572,46 +4572,50 @@ void idPhysics_Player::ToggleLean(float leanYawAngleDegrees)
 }
 
 //----------------------------------------------------------------------
-void idPhysics_Player::JoyLean( int ljx, int ljy, bool joymod )
+void idPhysics_Player::JoyLean( float ljang, float ljmag, bool joymod )
 {
-	float leanYawAngleDegrees;
 	if( joymod ) {
-		if( ljx != 0 && ljy != 0 ) {
-			leanYawAngleDegrees = atan( abs( ljy ) /  abs( ljx )) * 180 / idMath::PI;
-			if( ljx < 0 ) {
-				m_leanYawAngleDegrees = 180.0f - leanYawAngleDegrees;
-			}
-			else if ( ljx > 0 ) {
-				m_leanYawAngleDegrees = leanYawAngleDegrees;
-			}
-			else if ( ljx == 0 && ljy < 0 ) {
-				m_leanYawAngleDegrees = 90.0f;
-			}
-			int min = 0;
-			int max = 32768;
-			int square = ( ljx * ljx ) + ( ljy * ljy );
-			int magnitude = sqrt( square ); 
-			double Normal = (double)( magnitude - min ) / (double)( max - min );
-			if( Normal > 1 )
-				Normal = 1;
-			m_leanTime = cv_pm_lean_time.GetFloat();
+		//if( m_CurrentLeanTiltDegrees < 0.000001 ) {
+		if( 1 == 1 ) {
 			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
-			m_leanMoveEndTilt = Normal * cv_pm_lean_stretch.GetFloat();
-			m_leanMoveEndTilt = Normal * cv_pm_lean_angle.GetFloat();
-			m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
-			m_leanMoveMaxStretch = cv_pm_lean_stretch.GetFloat();
+			m_leanYawAngleDegrees = ljang;
+			if( ljang == 90.0f || ljang == -90.0f )
+			{
+				m_leanTime = cv_pm_lean_forward_time.GetFloat();
+				m_leanMoveEndTilt = ljmag * cv_pm_lean_forward_angle.GetFloat();
+				m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
+				m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
+			}
+			else
+			{
+				m_leanTime = cv_pm_lean_time.GetFloat();
+				m_leanMoveEndTilt = ljmag * cv_pm_lean_angle.GetFloat();
+				m_leanMoveMaxStretch = cv_pm_lean_stretch.GetFloat();
+				m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
+			}
+
 			m_b_leanFinished = false;
+
+			DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("JoystickLean Starting\r");
 		}
-		else
+		else 
 		{
-			if( m_leanTime > 0 && m_leanMoveEndTilt == 0 ) {
+			if (m_leanTime > 0 && m_leanMoveEndTilt == 0)
+			{
+				// We are already un-leaning
 				return;
 			}
+
+			// End the lean
 			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
 			m_leanTime = cv_pm_lean_forward_time.GetFloat();
 			m_leanMoveEndTilt = 0.0;
 			m_b_leanFinished = false;
-			DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("JoyLean ending\r");
+
+			// greebo: Leave the rest of the variables as they are
+			// to avoid view-jumping issues due to leaning back.
+
+			DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("ToggleLean ending lean\r");
 		}
 	}
 }
