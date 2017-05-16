@@ -4576,20 +4576,20 @@ void idPhysics_Player::JoyLean( float ljang, float ljmag, bool joymod )
 {
 	if( joymod ) {
 		//if( m_CurrentLeanTiltDegrees < 0.000001 ) {
-		if( ljmag > 0.0f  ) {
+		if( ljmag > 0.9f  ) {
 			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
 			m_leanYawAngleDegrees = ljang;
 			if( ljang == 90.0f || ljang == -90.0f )
 			{
 				m_leanTime = cv_pm_lean_forward_time.GetFloat();
-				m_leanMoveEndTilt = ljmag * cv_pm_lean_forward_angle.GetFloat();
+				m_leanMoveEndTilt = cv_pm_lean_forward_angle.GetFloat();
 				m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
 				m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
 			}
 			else
 			{
 				m_leanTime = cv_pm_lean_time.GetFloat();
-				m_leanMoveEndTilt = ljmag * cv_pm_lean_angle.GetFloat();
+				m_leanMoveEndTilt = cv_pm_lean_angle.GetFloat();
 				m_leanMoveMaxStretch = cv_pm_lean_stretch.GetFloat();
 				m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
 			}

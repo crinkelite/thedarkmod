@@ -1073,54 +1073,53 @@ void idUsercmdGenLocal::Joystick( void ) {
 		}
 		int square, magnitude;
 		double angle = 0;
+		//North
 		if( continuousJoyLX == 0 && continuousJoyLY < 0 ) {
 			cmd.ljang = 90.0f;
 			cmd.ljmag = float(continuousJoyLX) / -32768;
 		}
+		//West
 		else if( continuousJoyLX < 0 && continuousJoyLY == 0 ) {
 			cmd.ljang = 180.0f;
 			cmd.ljmag = float(continuousJoyLX) / -32768;
 		}
+		//East
 		else if( continuousJoyLX > 0 && continuousJoyLY == 0 ) {
 			cmd.ljang = 0.0f;
 			cmd.ljmag = float(continuousJoyLX) / 32768;
 		}
+		//South
 		else if( continuousJoyLX == 0 && continuousJoyLY > 0 ) {
 			cmd.ljang = 270.0f;
 			cmd.ljmag = float(continuousJoyLY) / 32768;
 		}
+		//North East
 		else if( continuousJoyLX > 0 && continuousJoyLY < 0 ) {
 			angle = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
 			cmd.ljang = angle;
-			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
-			magnitude = sqrt( square );
-			cmd.ljmag = double(magnitude) / double(32768);
 		}
+		//North West
 		else if( continuousJoyLX < 0 && continuousJoyLY < 0 ) {
 			angle = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
 			cmd.ljang = 180.0f - angle;
-			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
-			magnitude = sqrt( square );
-			cmd.ljmag = double(magnitude) / double(32768);
 		}
+		//South West
 		else if( continuousJoyLX < 0 && continuousJoyLY > 0 ) {
 			angle = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
 			cmd.ljang = 180.0f + angle;
-			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
-			magnitude = sqrt( square );
-			cmd.ljmag = double(magnitude) / double(32768);
 		}
+		//South East
 		else if( continuousJoyLX > 0 && continuousJoyLY > 0 ) {
 			angle = atan(  continuousJoyLY  /  continuousJoyLX ) * 180.0f / idMath::PI;
-			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
-			magnitude = sqrt( square );
-			cmd.ljang = 270.0f + angle;
-			cmd.ljmag = double(magnitude) / double(32768);
+			cmd.ljang = 360.0f - angle;
 		}
 		else {
 			cmd.ljmag = 0.0f;
 			cmd.ljang = 0.0f;
 		}
+		square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
+		magnitude = sqrt( square );
+		cmd.ljmag = double(magnitude) / double(32768);
 	}
 	Sys_EndJoyAxisEvents();
 }
