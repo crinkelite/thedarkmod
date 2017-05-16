@@ -4576,7 +4576,7 @@ void idPhysics_Player::JoyLean( float ljang, float ljmag, bool joymod )
 {
 	if( joymod ) {
 		//if( m_CurrentLeanTiltDegrees < 0.000001 ) {
-		if( 1 == 1 ) {
+		if( ljmag > 0.0f  ) {
 			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
 			m_leanYawAngleDegrees = ljang;
 			if( ljang == 90.0f || ljang == -90.0f )

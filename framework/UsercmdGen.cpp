@@ -1055,19 +1055,15 @@ void idUsercmdGenLocal::Joystick( void ) {
 			switch( axis ) {
 				case LX_AXIS:
 					continuousJoyLX = value;
-					cmd.ljmag = NormalizedValue;
 					break;
 				case LY_AXIS:
 					continuousJoyLY = value;
-					cmd.ljmag = NormalizedValue;
 					break;
 				case RX_AXIS:
 					continuousJoyRX = value;
-					cmd.rjmag = NormalizedValue;
 					break;
 				case RY_AXIS:
 					continuousJoyRY = value;
-					cmd.rjmag = NormalizedValue;
 					break;
 			}
 			if( NormalizedValue < 0 )
@@ -1075,12 +1071,55 @@ void idUsercmdGenLocal::Joystick( void ) {
 			else
 				joystickAxis[axis] = curve_value * 256;
 		}
-		if( continuousJoyLX != 0 && continuousJoyLY != 0 ) { 
-			cmd.ljang = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
-			int square, magnitude;
+		int square, magnitude;
+		double angle = 0;
+		if( continuousJoyLX == 0 && continuousJoyLY < 0 ) {
+			cmd.ljang = 90.0f;
+			cmd.ljmag = float(continuousJoyLX) / -32768;
+		}
+		else if( continuousJoyLX < 0 && continuousJoyLY == 0 ) {
+			cmd.ljang = 180.0f;
+			cmd.ljmag = float(continuousJoyLX) / -32768;
+		}
+		else if( continuousJoyLX > 0 && continuousJoyLY == 0 ) {
+			cmd.ljang = 0.0f;
+			cmd.ljmag = float(continuousJoyLX) / 32768;
+		}
+		else if( continuousJoyLX == 0 && continuousJoyLY > 0 ) {
+			cmd.ljang = 270.0f;
+			cmd.ljmag = float(continuousJoyLY) / 32768;
+		}
+		else if( continuousJoyLX > 0 && continuousJoyLY < 0 ) {
+			angle = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
+			cmd.ljang = angle;
 			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
 			magnitude = sqrt( square );
-			cmd.ljmag = float(magnitude) / 32768;
+			cmd.ljmag = double(magnitude) / double(32768);
+		}
+		else if( continuousJoyLX < 0 && continuousJoyLY < 0 ) {
+			angle = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
+			cmd.ljang = 180.0f - angle;
+			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
+			magnitude = sqrt( square );
+			cmd.ljmag = double(magnitude) / double(32768);
+		}
+		else if( continuousJoyLX < 0 && continuousJoyLY > 0 ) {
+			angle = atan( abs( continuousJoyLY ) / abs( continuousJoyLX )) * 180.0f / idMath::PI;
+			cmd.ljang = 180.0f + angle;
+			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
+			magnitude = sqrt( square );
+			cmd.ljmag = double(magnitude) / double(32768);
+		}
+		else if( continuousJoyLX > 0 && continuousJoyLY > 0 ) {
+			angle = atan(  continuousJoyLY  /  continuousJoyLX ) * 180.0f / idMath::PI;
+			square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
+			magnitude = sqrt( square );
+			cmd.ljang = 270.0f + angle;
+			cmd.ljmag = double(magnitude) / double(32768);
+		}
+		else {
+			cmd.ljmag = 0.0f;
+			cmd.ljang = 0.0f;
 		}
 	}
 	Sys_EndJoyAxisEvents();
