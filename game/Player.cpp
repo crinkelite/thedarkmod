@@ -6396,8 +6396,9 @@ void idPlayer::EvaluateControls( void )
 	{
 		PerformImpulse( usercmd.impulse );
 	}
-	physicsObj.JoyLean( usercmd.ljang, usercmd.ljmag, usercmd.joymod );
-
+	if ( usercmd.joymod && usercmd.ljmag > 0.0001 ) {
+		physicsObj.JoyLean( usercmd.ljang, usercmd.ljmag, usercmd.joymod );
+	}
 	scoreBoardOpen = ( ( usercmd.buttons & BUTTON_SCORES ) != 0 || forceScoreBoard );
 
 	oldFlags = usercmd.flags;

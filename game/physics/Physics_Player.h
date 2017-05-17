@@ -736,7 +736,7 @@ protected:
 	*/
 	bool m_b_leanFinished;
 
-	bool m_b_joyLeanMod;
+	bool m_b_leanJoyMod;
 
 	/*!
 	* How long will the current phase of the leaning operation take?

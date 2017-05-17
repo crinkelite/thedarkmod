@@ -2810,7 +2810,7 @@ idPhysics_Player::idPhysics_Player( void )
 	m_CurrentLeanTiltDegrees = 0.0;
 	m_CurrentLeanStretch = 0.0;
 	m_b_leanFinished = true;
-	m_b_joyLeanMod = false;
+	m_b_leanJoyMod = false;
 	m_leanMoveStartTilt = 0.0;
 	m_leanMoveEndTilt = 0.0;
 	m_leanMoveMaxAngle = 0.0;
@@ -4576,25 +4576,26 @@ void idPhysics_Player::JoyLean( float ljang, float ljmag, bool joymod )
 {
 	if( joymod ) {
 		//if( m_CurrentLeanTiltDegrees < 0.000001 ) {
-		if( ljmag > 0.9f  ) {
+		if( ljmag > 0.1f  ) {
 			m_leanMoveStartTilt = m_CurrentLeanTiltDegrees;
 			m_leanYawAngleDegrees = ljang;
 			if( ljang == 90.0f || ljang == -90.0f )
 			{
-				m_leanTime = cv_pm_lean_forward_time.GetFloat();
-				m_leanMoveEndTilt = cv_pm_lean_forward_angle.GetFloat();
+				m_leanTime = ljmag * cv_pm_lean_forward_time.GetFloat();
+				m_leanMoveEndTilt = ljmag * cv_pm_lean_forward_angle.GetFloat();
 				m_leanMoveMaxStretch = cv_pm_lean_forward_stretch.GetFloat();
 				m_leanMoveMaxAngle = cv_pm_lean_forward_angle.GetFloat();
 			}
 			else
 			{
-				m_leanTime = cv_pm_lean_time.GetFloat();
-				m_leanMoveEndTilt = cv_pm_lean_angle.GetFloat();
+				m_leanTime = ljmag * cv_pm_lean_time.GetFloat();
+				m_leanMoveEndTilt = ljmag * cv_pm_lean_angle.GetFloat();
 				m_leanMoveMaxStretch = cv_pm_lean_stretch.GetFloat();
 				m_leanMoveMaxAngle = cv_pm_lean_angle.GetFloat();
 			}
 
 			m_b_leanFinished = false;
+			m_b_leanJoyMod = true;
 
 			DM_LOG(LC_MOVEMENT, LT_DEBUG)LOGSTRING("JoystickLean Starting\r");
 		}
@@ -4808,13 +4809,13 @@ void idPhysics_Player::LeanMove()
 
 	// If player is leaned at all, do an additional clip test and unlean them
 	// In case they lean and walk into something, or a moveable moves into them, etc.
-	if( m_CurrentLeanTiltDegrees != 0.0	&& TestLeanClip() && m_b_joyLeanMod == false )
+	if( m_CurrentLeanTiltDegrees != 0.0	&& TestLeanClip() )
 	{
 		DM_LOG(LC_MOVEMENT,LT_DEBUG)LOGSTRING("Leaned player clipped solid, unleaning to valid position \r");
 
 		UnleanToValidPosition();
 	}
-	m_b_joyLeanMod = false;
+	m_b_leanJoyMod = false;
 
 	// Lean door test
 	if( IsLeaning() )
