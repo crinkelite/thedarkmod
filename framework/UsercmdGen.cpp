@@ -1117,6 +1117,9 @@ void idUsercmdGenLocal::Joystick( void ) {
 			cmd.ljmag = 0.0f;
 			cmd.ljang = 0.0f;
 		}
+		if( cmd.ljmag > 1 ) {
+			cmd.ljmag = 1.0f;
+		}
 		square = ( continuousJoyLX * continuousJoyLX ) + ( continuousJoyLY * continuousJoyLY );
 		magnitude = sqrt( square );
 		cmd.ljmag = double(magnitude) / double(32768);
