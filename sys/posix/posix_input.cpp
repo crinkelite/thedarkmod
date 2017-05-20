@@ -86,9 +86,9 @@ Posix_AddAxisPollEvent
 ==========
 */
 bool Posix_AddAxisPollEvent(int axis, int value) {
-	if (poll_axis_event_count >= MAX_POLL_EVENTS + POLL_EVENTS_HEADROOM) 
-		//common->FatalError( "poll_axis_event_count exceeded MAX_POLL_EVENT + POLL_EVENTS_HEADROOM\n");
-		return false;
+	if (poll_axis_event_count >= MAX_POLL_EVENTS + POLL_EVENTS_HEADROOM) {
+		common->FatalError( "poll_axis_event_count exceeded MAX_POLL_EVENT + POLL_EVENTS_HEADROOM\n");
+	}
 	poll_events_axis[poll_axis_event_count].axis = axis;
 	poll_events_axis[poll_axis_event_count++].value = value;
 	if (poll_axis_event_count >= MAX_POLL_EVENTS) {

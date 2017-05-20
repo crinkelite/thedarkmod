@@ -67,7 +67,7 @@ const char *idBindWindow::HandleEvent(const sysEvent_t *event, bool *updateVisua
 		}
 		return ret;
 	} else {
-		if (key == K_MOUSE1) {
+		if ( key == K_MOUSE1 || key == K_JOY12 ) {
 			waitingOnKey = true;
 			gui->SetBindHandler(this);
 			return "";
