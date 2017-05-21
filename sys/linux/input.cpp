@@ -50,6 +50,8 @@ static int mouse_accel_numerator;
 static int mouse_accel_denominator;
 static int mouse_threshold;
 
+static int joystick_reset_time;
+
 static byte s_scantokey[128] = {
 /*  0 */ 0, 0, 0, 0, 0, 0, 0, 0,
 /*  8 */ 0, 27, '1', '2', '3', '4', '5', '6', // 27 - ESC
@@ -379,9 +381,9 @@ void Posix_PollSDLInput() {
 		switch( ev.type ) {
 			case SDL_JOYAXISMOTION:
 				if( ev.jaxis.axis < MAX_JOYSTICK_AXIS )
-					{
+				{
 					Posix_AddAxisPollEvent( ev.jaxis.axis, ev.jaxis.value );
-					Posix_QueEvent( SE_JOYSTICK_AXIS , ev.jaxis.axis, ev.jaxis.value, 0, NULL );
+					//Posix_QueEvent( SE_JOYSTICK_AXIS , ev.jaxis.axis, ev.jaxis.value, 0, NULL );
 					switch( ev.jaxis.axis ) {
 						case RX_AXIS:
 							jx = ev.jaxis.value;
